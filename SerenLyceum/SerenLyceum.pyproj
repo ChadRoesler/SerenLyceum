@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <!-- SerenLyceum.slnx references this GUID: keep it. -->
+    <ProjectGuid>9a6cf065-66e8-41b0-8564-0a88405c8745</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <!-- F5 runs the service: python -m seren_lyceum -->
+    <StartupFile>seren_lyceum\__main__.py</StartupFile>
+    <SearchPath>.</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>SerenLyceum</Name>
+    <RootNamespace>seren_lyceum</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.11</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <Description>Train your own model without reading fifty papers first: a dataset in, a model out.</Description>
+    <TestFramework>Pytest</TestFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="seren_lyceum\__init__.py" />
+    <Compile Include="seren_lyceum\__main__.py" />
+    <Compile Include="seren_lyceum\app.py" />
+    <Compile Include="seren_lyceum\backends\__init__.py" />
+    <Compile Include="seren_lyceum\backends\local.py" />
+    <Compile Include="seren_lyceum\backends\runpod.py" />
+    <Compile Include="seren_lyceum\config.py" />
+    <Compile Include="seren_lyceum\datasets.py" />
+    <Compile Include="seren_lyceum\jobs.py" />
+    <Compile Include="seren_lyceum\protocol.py" />
+    <Compile Include="seren_lyceum\runner.py" />
+    <Compile Include="seren_lyceum\trainer\__init__.py" />
+    <Compile Include="seren_lyceum\trainer\cli.py" />
+    <Compile Include="seren_lyceum\trainer\run.py" />
+    <Compile Include="tests\conftest.py" />
+    <Compile Include="tests\test_datasets.py" />
+    <Compile Include="tests\test_flow.py" />
+    <Compile Include="tests\test_protocol.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="seren_lyceum\" />
+    <Folder Include="seren_lyceum\backends\" />
+    <Folder Include="seren_lyceum\trainer\" />
+    <Folder Include="seren_lyceum\viewer\" />
+    <Folder Include="seren_lyceum\viewer\ui\" />
+    <Folder Include="tests\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="pyproject.toml" />
+    <Content Include="README.md" />
+    <Content Include="seren-lyceum.yaml.sample" />
+    <!-- The viewer. Content, not Compile - and package-data in pyproject.toml,
+         without which these are absent from the wheel and /viewer fails. -->
+    <Content Include="seren_lyceum\viewer\ui\body.html" />
+    <Content Include="seren_lyceum\viewer\ui\header_aside.html" />
+    <Content Include="seren_lyceum\viewer\ui\scripts.js" />
+    <Content Include="seren_lyceum\viewer\ui\styles.css" />
+    <Content Include="seren_lyceum\viewer\ui\tabs.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.11" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

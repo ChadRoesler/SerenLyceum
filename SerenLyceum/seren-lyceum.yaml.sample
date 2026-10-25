@@ -1,0 +1,100 @@
+# seren-lyceum.yaml - SerenLyceum config
+#
+# Lives at ~/seren-lyceum/seren-lyceum.yaml, or wherever --config or
+# $SEREN_LYCEUM_CONFIG points. Precedence (highest wins): env vars > this file
+# > built-in defaults. Every key is optional: a missing one uses the default
+# beside it, and a malformed file falls back rather than taking the service
+# down.
+
+
+# ── The server ───────────────────────────────────────────────────────────────
+server:
+  # Default: 127.0.0.1. Widen it to reach the Lyceum from another box - and
+  # put a token in front when you do: this service STARTS TRAININGS, which run
+  # code on this box's GPU. A host beyond loopback with no token refuses to
+  # start and prints the three ways out (allow_open_lan: true to run open on
+  # a trusted LAN on purpose; it says so every boot).
+  host: 127.0.0.1
+  # Default: 7428. Family convention: memory 7420, margin 7421, loci 7422,
+  # corpus-callosum 7423, hippocampus 7424, workbench 7425, symposium 7426,
+  # theatre 7427, lyceum 7428, probe 7430, observatory 7777.
+  port: 7428
+  # The token callers present (Authorization: Bearer ...). One of:
+  # bearer_token: "..."              # inline (escape hatch)
+  # bearer_token_env: SEREN_LYCEUM_TOKEN
+  # bearer_token_keyring: "seren-lyceum/token"
+
+
+# ── Where it keeps things ────────────────────────────────────────────────────
+storage:
+  # Jobs (a folder each), datasets, and what training made. Models are big:
+  # put this on a disk with room. Default: ~/.seren-lyceum
+  state_dir: ""
+
+
+# ── Training on THIS box ─────────────────────────────────────────────────────
+local:
+  # The TRAINING environment's python: a venv with seren-lyceum[train] and a
+  # torch built for this box's GPU. The service never imports torch; it forks
+  # `python -m seren_lyceum.trainer.cli <job>` with this interpreter. Empty =
+  # this box does not train (it can still send jobs to a cloud).
+  #
+  #   python3 -m venv ~/seren-lyceum/train
+  #   ~/seren-lyceum/train/bin/pip install torch --index-url https://download.pytorch.org/whl/cu130
+  #   ~/seren-lyceum/train/bin/pip install "seren-lyceum[train]"
+  python: ""
+  # A llama.cpp checkout with llama-quantize built, for turning a finished
+  # model into one GGUF file. Without it a run still ends with the merged
+  # model and the adapter, and says why there is no GGUF.
+  llama_cpp: ""
+  # Hugging Face's home on this box: where models download to and where the
+  # login lives ($HF_HOME/token, what node setup or `hf auth login` writes).
+  # Empty = $HF_HOME. The Lyceum asks for a login only when there isn't one.
+  hf_home: ""
+  # How the UI names this box ("the Spark", "my desktop"). Default: this box.
+  label: ""
+  # Trainings at once on this box. Default: 1 (one GPU, one lesson).
+  max_parallel: 1
+
+
+# ── Training in the cloud ────────────────────────────────────────────────────
+# Each provider is a plugin; RunPod ships with the Lyceum. Nothing here means
+# no cloud. (The RunPod round trip is the next piece of work: it is listed in
+# the UI as coming until then.)
+# clouds:
+#   runpod:
+#     api_key_env: RUNPOD_API_KEY
+#     gpu: "NVIDIA RTX A6000"
+
+
+# How often a running job's folder is re-read, in seconds. Default: 2.
+refresh_seconds: 2
+
+# "Is there a newer seren-lyceum". Cosmetic.
+updates:
+  enabled: true
+
+
+# ── Extras: your own ─────────────────────────────────────────────────────────
+# Things a training can switch on that are not the training itself. The
+# built-ins (flash attention, 4-bit loading, Liger, packing, NEFTune, DoRA,
+# rsLoRA, an 8-bit optimizer) are always known; the Config tab switches each
+# on or off, and New training offers the ones that are on and that this box
+# has. Add your own here, the same shape: what it needs to import in the
+# training environment, and the arguments it sets for loading the model
+# (model), for TRL's SFTConfig (train) or for PEFT's LoraConfig (lora). An
+# argument this version of TRL or PEFT does not take is skipped with a line in
+# the log. A training copies the definitions it used, so changing them here
+# never changes a run that already happened.
+#
+# extras:
+#   - id: longer-warmup
+#     name: A longer warm-up
+#     say: Starts gentler - for a dataset that knocks the model about early.
+#     train: {warmup_ratio: 0.1}
+#   - id: unsloth-gc
+#     name: Unsloth checkpointing
+#     say: Unsloth's gradient checkpointing; less memory on long examples.
+#     needs: unsloth
+#     install: pip install unsloth
+#     train: {gradient_checkpointing_kwargs: {use_reentrant: false}}

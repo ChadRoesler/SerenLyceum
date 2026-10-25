@@ -1,0 +1,142 @@
+<div id="globalErr"></div>
+
+<!-- TRAININGS: the list on the left, the chosen one on the right. -->
+<section class="view active" id="trainings">
+    <div class="split">
+        <aside class="job-list" id="jobList"><div class="empty">Loading…</div></aside>
+        <div class="job-detail" id="jobDetail">
+            <div class="welcome">
+                <div class="pithos" aria-hidden="true"></div>
+                <h2>Nothing's training yet.</h2>
+                <p>A training takes something you want a model to learn - your conversations, your notes, how you
+                   write - and teaches it to a model you pick. You don't need to know how. Start one and it'll tell
+                   you what it's doing, in words, the whole way.</p>
+                <button class="btn primary" onclick="switchTab('new')">Start a training</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NEW TRAINING: five questions, in order, each answered by picking a card. -->
+<section class="view" id="new">
+    <div class="wizard">
+        <div class="import-row">
+            <span class="muted small">Ran one before? Start from its config:</span>
+            <label class="btn ghost small-btn">Import a config<input type="file" id="cfgFile" accept=".json" hidden /></label>
+            <span id="cfgNote" class="muted small"></span>
+        </div>
+
+        <div class="step" id="step-data">
+            <div class="step-h"><span class="num">1</span> What should it learn?
+                <span class="tip" title="A dataset is a file of examples: a question and the answer you want, over and over. The model learns to answer like that.">?</span></div>
+            <div class="cards" id="pickData"></div>
+            <div class="row test-row"><span class="muted small">Test it on:</span>
+                <select id="testSel"></select>
+                <span class="tip" title="At the end it answers questions it never learned from, so you can read how it does. By default those are a random few of your examples, held back. Pick a dataset of your own questions and it is tested on exactly those instead, and learns from every example.">?</span></div>
+            <details class="add-data" id="addDataBox">
+                <summary>Add a dataset</summary>
+                <div class="add-form">
+                    <input id="dsName" placeholder="a name for it (e.g. my-chats)" />
+                    <select id="dsUse" title="What it is for">
+                        <option value="learn">examples to learn from</option>
+                        <option value="questions">questions to test with</option>
+                    </select>
+                    <input id="dsFile" type="file" accept=".jsonl,.json,.txt" />
+                </div>
+                <textarea id="dsNote" rows="2" placeholder="what's in it, in your words (required): where it came from, what it should teach"></textarea>
+                <div class="add-go"><button class="btn" id="dsAdd">Add</button>
+                    <span class="muted small">Examples: one per line (JSONL) - conversations, ShareGPT, instruction/output,
+                    prompt/completion or plain text. Questions: one per line, as plain text or JSON, with the answer you
+                    expect if you have one.</span></div>
+                <div id="dsFound"></div>
+                <div id="fromHip"></div>
+            </details>
+        </div>
+
+        <div class="step" id="step-model">
+            <div class="step-h"><span class="num">2</span> Start from which model?
+                <span class="tip" title="Training doesn't build a model from nothing: it takes one that already talks and teaches it your examples. Smaller models train faster and run on smaller boxes.">?</span></div>
+            <div class="cards" id="pickModel"></div>
+            <div class="row"><span class="muted small">or any model on Hugging Face:</span>
+                <input id="modelOther" placeholder="owner/model-name" /></div>
+            <div id="loginAsk"></div>
+        </div>
+
+        <div class="step" id="step-where">
+            <div class="step-h"><span class="num">3</span> Where should it train?</div>
+            <div class="cards" id="pickWhere"></div>
+        </div>
+
+        <div class="step" id="step-effort">
+            <div class="step-h"><span class="num">4</span> How hard should it study?</div>
+            <div class="cards three" id="pickEffort"></div>
+            <details class="advanced" id="advBox">
+                <summary>Advanced (the numbers behind it)</summary>
+                <div class="adv-grid" id="advGrid"></div>
+                <div class="adv-extras" id="advExtras"></div>
+                <p class="muted small">Leave these alone and the level you picked sets them. Change one and yours wins.</p>
+            </details>
+        </div>
+
+        <div class="step" id="step-out">
+            <div class="step-h"><span class="num">5</span> What should come out?
+                <span class="tip" title="A GGUF is the one-file kind of model llama.cpp and most local apps load. The quant is how much it's squeezed: smaller files run on smaller boxes and lose a little.">?</span></div>
+            <div class="quant-row">
+                <div id="quantMain"></div>
+                <label class="quant-other"><span class="muted small">or something else:</span>
+                    <select id="quantOther"></select></label>
+            </div>
+            <div class="row">
+                <input id="jobName" placeholder="name this training (optional)" />
+                <input id="jobNotes" placeholder="notes (optional)" />
+            </div>
+        </div>
+
+        <div class="go">
+            <div class="summary" id="goSummary"></div>
+            <button class="btn primary big" id="goBtn">Start training</button>
+        </div>
+    </div>
+</section>
+
+<!-- DATASETS -->
+<section class="view" id="datasets">
+    <div class="split">
+        <aside class="job-list">
+            <details class="imp" id="impBox">
+                <summary>Import a dataset</summary>
+                <div class="add-form">
+                    <input id="imName" placeholder="a name for it (e.g. my-chats)" />
+                    <select id="imUse" title="What it is for">
+                        <option value="learn">examples to learn from</option>
+                        <option value="questions">questions to test with</option>
+                    </select>
+                    <input id="imFile" type="file" accept=".jsonl,.json,.txt" />
+                </div>
+                <textarea id="imNote" rows="2" placeholder="what's in it, in your words (required): where it came from, what it should teach"></textarea>
+                <div class="add-go"><button class="btn" id="imAdd">Add</button>
+                    <span class="muted small">Examples: one per line (JSONL) - conversations, ShareGPT, instruction/output,
+                    prompt/completion or plain text. Questions: one per line, as plain text or JSON, with the answer you
+                    expect if you have one.</span></div>
+                <div id="imFound"></div>
+            </details>
+            <div class="ds-list" id="dsList"><div class="empty">Loading…</div></div>
+        </aside>
+        <div class="job-detail" id="dsDetail"><div class="empty">Pick a dataset to see what's in it.</div></div>
+    </div>
+</section>
+
+<!-- THIS BOX -->
+<section class="view" id="box">
+    <div class="box-grid" id="boxGrid"><div class="empty">Asking this box what it has…</div></div>
+</section>
+
+<!-- The one modal: the whole dataset, all the sample answers, the big graph. -->
+<div class="lx-modal" id="modal" hidden>
+    <div class="lx-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="lx-h"><h2 id="modalTitle"></h2>
+            <div class="lx-actions" id="modalActions"></div>
+            <button class="lx-x" aria-label="Close" onclick="closeModal()">×</button></div>
+        <div class="lx-body" id="modalBody"></div>
+    </div>
+</div>
