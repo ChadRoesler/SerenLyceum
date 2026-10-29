@@ -37,7 +37,7 @@ from seren_meninges import get_version
 from seren_meninges.auth import bearer_auth_middleware
 from seren_meninges.updates import updates_payload
 from seren_meninges.viewer import render_from_dir
-from seren_sinew.request_log import RequestLoggingMiddleware
+from seren_sinew.request_log import RequestLoggingMiddleware, request_id_hooks
 
 from . import __version__ as _fallback_version
 from . import backends as backends_mod
@@ -261,7 +261,7 @@ def create_app(config: Optional[LyceumConfig] = None) -> FastAPI:
             raise HTTPException(404, "no hippocampus is configured (hippocampus.url)")
         tok = hc.resolve_bearer()
         try:
-            async with httpx.AsyncClient(timeout=hc.timeout_seconds) as c:
+            async with httpx.AsyncClient(timeout=hc.timeout_seconds, event_hooks=request_id_hooks(asynchronous=True)) as c:
                 r = await c.get(hc.url.rstrip("/") + "/training-set.jsonl",
                                 headers={"Authorization": f"Bearer {tok}"} if tok else {})
         except httpx.HTTPError as e:
